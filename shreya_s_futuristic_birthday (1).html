@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Shreya! 🚀</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-pink: #ff2a6d;
+            --neon-blue: #05d9e8;
+            --dark-bg: #01012b;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden; /* Hide scrollbars for the immersive experience */
+            background-color: var(--dark-bg);
+            color: white;
+            font-family: 'Rajdhani', sans-serif;
+            user-select: none;
+        }
+
+        h1, h2, h3, .futuristic-font {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* 3D Canvas Background */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Main Container for Sections */
+        #app-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            pointer-events: none; /* Let clicks pass through to canvas when appropriate */
+        }
+
+        /* Generic Section Styles */
+        .layer-section {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: auto; /* Enable interactions within active sections */
+            transition: opacity 0.8s ease-in-out, visibility 0.8s;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+
+        .layer-section.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Neon Text Effects */
+        .neon-text-pink {
+            color: #fff;
+            text-shadow:
+                0 0 5px #fff,
+                0 0 10px #fff,
+                0 0 20px var(--neon-pink),
+                0 0 40px var(--neon-pink),
+                0 0 80px var(--neon-pink);
+        }
+
+        .neon-text-blue {
+            color: #fff;
+            text-shadow:
+                0 0 5px #fff,
+                0 0 10px #fff,
+                0 0 20px var(--neon-blue),
+                0 0 40px var(--neon-blue),
+                0 0 80px var(--neon-blue);
+        }
+
+        /* Interactive Buttons */
+        .cyber-btn {
+            background: transparent;
+            color: var(--neon-blue);
+            border: 2px solid var(--neon-blue);
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+            border-radius: 5px;
+            box-shadow: 0 0 10px var(--neon-blue) inset, 0 0 10px var(--neon-blue);
+            margin-top: 2rem;
+        }
+
+        .cyber-btn:hover {
+            background: var(--neon-blue);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px var(--neon-blue) inset, 0 0 20px var(--neon-blue);
+        }
+
+        .cyber-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .cyber-btn:hover::before {
+            left: 100%;
+        }
+
+        /* Glitch Effect */
+        .glitch-container {
+            position: relative;
+        }
+        
+        .glitch {
+            position: relative;
+            font-size: 4rem;
+            font-weight: 900;
+        }
+
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 red;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 blue;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(61px, 9999px, 52px, 0); }
+            20% { clip: rect(33px, 9999px, 14px, 0); }
+            40% { clip: rect(96px, 9999px, 73px, 0); }
+            60% { clip: rect(2px, 9999px, 86px, 0); }
+            80% { clip: rect(55px, 9999px, 49px, 0); }
+            100% { clip: rect(79px, 9999px, 26px, 0); }
+        }
+
+        @keyframes glitch-anim2 {
+            0% { clip: rect(29px, 9999px, 83px, 0); }
+            20% { clip: rect(65px, 9999px, 11px, 0); }
+            40% { clip: rect(40px, 9999px, 68px, 0); }
+            60% { clip: rect(13px, 9999px, 92px, 0); }
+            80% { clip: rect(71px, 9999px, 34px, 0); }
+            100% { clip: rect(8px, 9999px, 57px, 0); }
+        }
+
+        /* Image Gallery Grid */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 20px;
+            background: rgba(1, 1, 43, 0.7);
+            border: 1px solid var(--neon-blue);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(5, 217, 232, 0.3);
+            /* Custom Scrollbar */
+            scrollbar-width: thin;
+            scrollbar-color: var(--neon-blue) transparent;
+        }
+        
+        .memory-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+        .memory-grid::-webkit-scrollbar-thumb {
+            background-color: var(--neon-blue);
+            border-radius: 10px;
+        }
+
+        .memory-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            aspect-ratio: 1; /* Keep images somewhat square-ish in grid */
+        }
+
+        .memory-card:hover {
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 15px var(--neon-pink);
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        .memory-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .memory-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .memory-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0,0,0,0.8);
+            color: var(--neon-blue);
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .memory-card:hover .memory-caption {
+            transform: translateY(0);
+        }
+
+        /* Terminal Style Text */
+        .terminal-text {
+            font-family: monospace;
+            color: #0f0;
+            background: rgba(0,0,0,0.8);
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid #0f0;
+            text-shadow: 0 0 5px #0f0;
+            white-space: pre-wrap;
+            max-width: 800px;
+            margin-bottom: 20px;
+            text-align: left;
+            font-size: 1.1rem;
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.2em;
+            background-color: #0f0;
+            animation: blink 1s step-end infinite;
+            vertical-align: text-bottom;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Final Surprise Overlay */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        /* Interactive floating elements in final layer */
+        .floating-element {
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.2s;
+            filter: drop-shadow(0 0 10px var(--neon-pink));
+        }
+        .floating-element:hover {
+            transform: scale(1.2);
+        }
+
+        /* Custom Modal for Image Preview */
+        #image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        #image-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #modal-img {
+            max-width: 90%;
+            max-height: 90vh;
+            border: 3px solid var(--neon-pink);
+            box-shadow: 0 0 30px var(--neon-pink);
+            border-radius: 10px;
+        }
+        #close-modal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 3rem;
+            cursor: pointer;
+            font-family: 'Orbitron';
+        }
+        #close-modal:hover {
+            color: var(--neon-pink);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 3D Background -->
+    <div id="canvas-container"></div>
+
+    <!-- Main Content Layers -->
+    <div id="app-container">
+        
+        <!-- LAYER 1: Boot Sequence -->
+        <div id="layer-1" class="layer-section active">
+            <div class="terminal-text" id="boot-text"></div>
+            <button class="cyber-btn" id="btn-enter" style="display: none;">Initialize Sequence</button>
+        </div>
+
+        <!-- LAYER 2: The Glitch Reveal -->
+        <div id="layer-2" class="layer-section">
+            <div class="glitch-container mb-8">
+                <h1 class="glitch neon-text-blue text-5xl md:text-7xl text-center" data-text="SYSTEM COMPROMISED">SYSTEM COMPROMISED</h1>
+            </div>
+            <h2 class="text-2xl md:text-4xl futuristic-font text-white mb-8 text-center" id="decrypt-msg">Decrypting payload...</h2>
+            
+            <!-- Interactive Decryption Minigame (Simple clicker) -->
+            <div class="flex flex-col items-center">
+                <p class="mb-4 text-gray-400">Click to accelerate decryption</p>
+                <div class="w-64 h-8 border-2 border-neon-blue rounded-full overflow-hidden relative mb-6">
+                    <div id="progress-bar" class="h-full bg-neon-blue w-0" style="box-shadow: 0 0 10px var(--neon-blue);"></div>
+                    <div id="progress-text" class="absolute inset-0 flex justify-center items-center font-bold text-dark-bg mix-blend-difference">0%</div>
+                </div>
+                <button class="cyber-btn" id="btn-decrypt" style="padding: 20px 40px; font-size: 1.5rem;">DECRYPT</button>
+            </div>
+        </div>
+
+        <!-- LAYER 3: Memory Matrix -->
+        <div id="layer-3" class="layer-section">
+            <h1 class="neon-text-pink text-4xl md:text-6xl mb-6 text-center glitch" data-text="MEMORY DATABANKS">MEMORY DATABANKS</h1>
+            <p class="text-xl mb-6 text-center max-w-2xl">Accessing files from the College Era. Warning: High levels of goofiness detected.</p>
+            
+            <div class="memory-grid" id="gallery">
+                <!-- Images will be injected here by JS -->
+            </div>
+            
+            <button class="cyber-btn mt-8" id="btn-next-layer">Access Core Protocol</button>
+        </div>
+
+        <!-- LAYER 4: The Final Surprise -->
+        <div id="layer-4" class="layer-section">
+            <h1 class="neon-text-blue text-6xl md:text-8xl mb-4 text-center glitch" data-text="HAPPY BIRTHDAY">HAPPY BIRTHDAY</h1>
+            <h1 class="neon-text-pink text-7xl md:text-9xl mb-8 text-center uppercase" style="font-family: 'Orbitron', sans-serif;">SHREYA!</h1>
+            
+            <div class="bg-black bg-opacity-60 p-8 rounded-lg border border-pink-500 max-w-3xl text-center backdrop-blur-sm z-10" style="box-shadow: 0 0 20px rgba(255, 42, 109, 0.5);">
+                <p class="text-2xl mb-4 leading-relaxed">
+                    To my personal bank and the almost mother of my brother's children.
+                </p>
+                <p class="text-xl text-gray-300">
+                    May your year ahead be as bright as your teeth. Looking for more chowrasta adventures. Keep being awesome, keep being goofy, and have the best birthday ever! 🎂✨
+                </p>
+            </div>
+
+            <!-- Interactive elements to click in final layer -->
+            <div id="interactive-gifts-container" class="absolute w-full h-full pointer-events-none top-0 left-0">
+                <!-- Emojis will be spawned here -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="image-modal">
+        <span id="close-modal">&times;</span>
+        <img id="modal-img" src="" alt="Memory">
+    </div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <script>
+        // --- Configuration & Data ---
+        const imagesData = [
+            { src: 'Shreya_Single.jpeg', caption: 'Classic College Vibes' },
+            { src: 'Damn_Shreya.jpeg', caption: 'The "What did you just say?" look 👀' },
+            { src: 'Me_and_Shreya.jpeg', caption: 'Looking sharp! ✨' },
+            { src: 'Freshers_Trio.jpeg', caption: 'Squad Goals' },
+            { src: 'BBIT_Trio.jpeg', caption: 'Caught off guard 😂' },
+            // Adding a few placeholder placeholders to fill the grid if needed for visual impact
+            { src: 'https://placehold.co/400x400/01012b/05d9e8?text=Missing+Data+File', caption: 'Corrupted File' },
+            { src: 'https://placehold.co/400x400/01012b/ff2a6d?text=Secret+Memory', caption: 'Redacted' }
+        ];
+
+        let currentLayer = 1;
+
+        // --- Utility Functions ---
+        function switchLayer(layerNumber) {
+            document.querySelectorAll('.layer-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(`layer-${layerNumber}`).classList.add('active');
+            currentLayer = layerNumber;
+
+            // Trigger specific animations based on layer
+            if(layerNumber === 3) initGalleryAnimations();
+            if(layerNumber === 4) triggerFinalSurprise();
+        }
+
+        // --- STREAMING_CHUNK:Three.js Background Setup ---
+        // Setup Three.js scene for a dynamic, futuristic particle background
+        const canvasContainer = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        // Add a slight fog for depth
+        scene.fog = new THREE.FogExp2(0x01012b, 0.002);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        canvasContainer.appendChild(renderer.domElement);
+
+        // Create Particles (Stars/Data nodes)
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 2000;
+        
+        const posArray = new Float32Array(particlesCount * 3);
+        const colorsArray = new Float32Array(particlesCount * 3);
+
+        const color1 = new THREE.Color(0x05d9e8); // Neon Blue
+        const color2 = new THREE.Color(0xff2a6d); // Neon Pink
+
+        for(let i = 0; i < particlesCount * 3; i+=3) {
+            // Spread particles over a large volume
+            posArray[i] = (Math.random() - 0.5) * 20;     // x
+            posArray[i+1] = (Math.random() - 0.5) * 20;   // y
+            posArray[i+2] = (Math.random() - 0.5) * 20;   // z
+
+            // Mix colors
+            const mixedColor = color1.clone().lerp(color2, Math.random());
+            colorsArray[i] = mixedColor.r;
+            colorsArray[i+1] = mixedColor.g;
+            colorsArray[i+2] = mixedColor.b;
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
+
+        // Custom Shader Material for glowing particles
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.05,
+            vertexColors: true,
+            blending: THREE.AdditiveBlending,
+            transparent: true,
+            opacity: 0.8
+        });
+
+        const particleMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particleMesh);
+
+        // Add some geometric shapes floating around (representing data packets)
+        const geometries = [
+            new THREE.IcosahedronGeometry(0.5, 0),
+            new THREE.OctahedronGeometry(0.4, 0),
+            new THREE.TetrahedronGeometry(0.6, 0)
+        ];
+        
+        const wireframeMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0x05d9e8, 
+            wireframe: true, 
+            transparent: true, 
+            opacity: 0.3 
+        });
+
+        const floatingObjects = [];
+        for(let i=0; i<15; i++) {
+            const geo = geometries[Math.floor(Math.random() * geometries.length)];
+            const mesh = new THREE.Mesh(geo, wireframeMaterial);
+            
+            mesh.position.set(
+                (Math.random() - 0.5) * 15,
+                (Math.random() - 0.5) * 15,
+                (Math.random() - 0.5) * 15
+            );
+            
+            mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+            
+            // Custom properties for animation
+            mesh.userData = {
+                rotSpeedX: (Math.random() - 0.5) * 0.02,
+                rotSpeedY: (Math.random() - 0.5) * 0.02,
+                moveSpeed: (Math.random() - 0.5) * 0.01
+            };
+            
+            scene.add(mesh);
+            floatingObjects.push(mesh);
+        }
+
+        camera.position.z = 5;
+
+        // Mouse interaction logic
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        const windowHalfX = window.innerWidth / 2;
+        const windowHalfY = window.innerHeight / 2;
+
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX - windowHalfX);
+            mouseY = (event.clientY - windowHalfY);
+        });
+
+        // Animation Loop
+        const clock = new THREE.Clock();
+
+        function animateThreeJS() {
+            requestAnimationFrame(animateThreeJS);
+            const elapsedTime = clock.getElapsedTime();
+
+            // Rotate entire particle system slowly
+            particleMesh.rotation.y = elapsedTime * 0.05;
+            particleMesh.rotation.x = elapsedTime * 0.02;
+
+            // Animate floating geometric objects
+            floatingObjects.forEach(obj => {
+                obj.rotation.x += obj.userData.rotSpeedX;
+                obj.rotation.y += obj.userData.rotSpeedY;
+                obj.position.y += Math.sin(elapsedTime * 2 + obj.position.x) * obj.userData.moveSpeed;
+            });
+
+            // Smooth mouse follow camera movement
+            targetX = mouseX * 0.001;
+            targetY = mouseY * 0.001;
+            
+            // Adjust interaction based on layer
+            if (currentLayer === 4) {
+                // Hyperdrive effect on final layer
+                camera.position.z -= 0.05;
+                if(camera.position.z < -10) camera.position.z = 5;
+                particleMesh.material.size = 0.1;
+                particleMesh.material.color.setHex(0xffffff);
+            } else {
+                camera.position.z = 5;
+                camera.position.x += 0.05 * (targetX - camera.position.x);
+                camera.position.y += 0.05 * (-targetY - camera.position.y);
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        animateThreeJS();
+
+        // Handle Window Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+
+        // --- STREAMING_CHUNK:Layer 1 Logic - Boot Sequence ---
+        const bootTextContainer = document.getElementById('boot-text');
+        const btnEnter = document.getElementById('btn-enter');
+        
+        const bootSequence = [
+            "Initiating connection...",
+            "Bypassing security protocols...",
+            "Accessing classified files...",
+            "Target identified: SHREYA",
+            "Loading memory modules...",
+            "WARNING: Anomaly detected.",
+            "Override required."
+        ];
+
+        async function typeText() {
+            let fullText = "";
+            for (let i = 0; i < bootSequence.length; i++) {
+                let line = bootSequence[i];
+                fullText += "> ";
+                bootTextContainer.innerHTML = fullText + '<span class="cursor"></span>';
+                
+                for (let j = 0; j < line.length; j++) {
+                    fullText += line[j];
+                    bootTextContainer.innerHTML = fullText + '<span class="cursor"></span>';
+                    // Randomize typing speed slightly for realism
+                    await new Promise(r => setTimeout(r, 20 + Math.random() * 50));
+                }
+                fullText += "\n";
+                bootTextContainer.innerHTML = fullText + '<span class="cursor"></span>';
+                await new Promise(r => setTimeout(r, 400));
+            }
+            
+            // Show enter button
+            btnEnter.style.display = 'inline-block';
+            // Simple GSAP pop-in
+            gsap.fromTo(btnEnter, {scale: 0, opacity: 0}, {scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.7)"});
+        }
+
+        // Start boot sequence on load
+        window.addEventListener('load', typeText);
+
+        btnEnter.addEventListener('click', () => {
+            switchLayer(2);
+            // Change background color slightly
+            gsap.to("body", {backgroundColor: "#02001a", duration: 1});
+            particleMesh.material.color.setHex(0xff0000); // Turn particles red for warning
+        });
+
+
+        // --- STREAMING_CHUNK:Layer 2 Logic - The Decryption Game ---
+        let decryptionProgress = 0;
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const btnDecrypt = document.getElementById('btn-decrypt');
+        const decryptMsg = document.getElementById('decrypt-msg');
+        let autoDecryptInterval;
+
+        function updateProgress(amount) {
+            decryptionProgress += amount;
+            if (decryptionProgress > 100) decryptionProgress = 100;
+            
+            progressBar.style.width = `${decryptionProgress}%`;
+            progressText.innerText = `${Math.floor(decryptionProgress)}%`;
+
+            if (decryptionProgress >= 100) {
+                clearInterval(autoDecryptInterval);
+                btnDecrypt.disabled = true;
+                btnDecrypt.innerText = "ACCESS GRANTED";
+                btnDecrypt.style.borderColor = "#0f0";
+                btnDecrypt.style.color = "#0f0";
+                decryptMsg.innerText = "Payload decrypted successfully.";
+                decryptMsg.classList.replace('text-white', 'text-green-400');
+                
+                // Return particles to normal
+                particleMesh.material.color.setHex(0xffffff);
+
+                setTimeout(() => {
+                    switchLayer(3);
+                }, 1500);
+            }
+        }
+
+        // Click to decrypt faster
+        btnDecrypt.addEventListener('click', () => {
+            // Add a little shake effect to the button
+            gsap.to(btnDecrypt, {x: (Math.random()-0.5)*10, y: (Math.random()-0.5)*10, duration:0.1, yoyo:true, repeat:3});
+            updateProgress(8);
+        });
+
+        // Observer to start auto decryption when layer is visible
+        const layer2Observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.target.classList.contains('active')) {
+                     autoDecryptInterval = setInterval(() => {
+                        if(currentLayer === 2) updateProgress(1.5);
+                    }, 100);
+                }
+            });
+        });
+        layer2Observer.observe(document.getElementById('layer-2'), { attributes: true, attributeFilter: ['class'] });
+
+
+        // --- STREAMING_CHUNK:Layer 3 Logic - Image Gallery ---
+        const galleryContainer = document.getElementById('gallery');
+        const modal = document.getElementById('image-modal');
+        const modalImg = document.getElementById('modal-img');
+        const closeModal = document.getElementById('close-modal');
+
+        // Populate gallery
+        imagesData.forEach((data, index) => {
+            const card = document.createElement('div');
+            card.className = 'memory-card';
+            // Start invisible for GSAP stagger
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+
+            const img = document.createElement('img');
+            img.src = data.src;
+            img.alt = `Memory ${index + 1}`;
+            
+            // Fallback for missing images
+            img.onerror = function() {
+                this.src = `https://placehold.co/400x400/01012b/ff2a6d?text=Image+Not+Found`;
+            };
+
+            const caption = document.createElement('div');
+            caption.className = 'memory-caption';
+            caption.innerText = data.caption;
+
+            card.appendChild(img);
+            card.appendChild(caption);
+            galleryContainer.appendChild(card);
+
+            // Modal functionality
+            card.addEventListener('click', () => {
+                modalImg.src = img.src;
+                modal.classList.add('active');
+            });
+        });
+
+        closeModal.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        modal.addEventListener('click', (e) => {
+            if(e.target === modal) modal.classList.remove('active');
+        });
+
+        function initGalleryAnimations() {
+            // Use GSAP to animate cards in with a stagger effect
+            gsap.to('.memory-card', {
+                opacity: 1,
+                y: 0,
+                duration: 0.5,
+                stagger: 0.1,
+                ease: "power2.out",
+                delay: 0.2 // Wait for layer transition
+            });
+        }
+
+        document.getElementById('btn-next-layer').addEventListener('click', () => {
+            switchLayer(4);
+        });
+
+
+        // --- STREAMING_CHUNK:Layer 4 Logic - Final Surprise & Interactions ---
+        const interactiveGiftsContainer = document.getElementById('interactive-gifts-container');
+        const emojis = ['🎂', '🎉', '🎁', '🎈', '✨', '💖', '🚀', '🥳'];
+
+        function triggerFinalSurprise() {
+            // Flash bang effect
+            gsap.fromTo("body", {backgroundColor: "#ffffff"}, {backgroundColor: "var(--dark-bg)", duration: 2});
+            
+            // Change Three.js theme to hyperdrive (handled in animate loop based on currentLayer)
+
+            startConfetti();
+            spawnInteractiveElements();
+        }
+
+        function spawnInteractiveElements() {
+            interactiveGiftsContainer.innerHTML = ''; // Clear existing
+            // Enable pointer events on container so children can be clicked
+            interactiveGiftsContainer.style.pointerEvents = 'auto';
+
+            for(let i=0; i<15; i++) {
+                const el = document.createElement('div');
+                el.className = 'floating-element text-4xl';
+                el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                
+                // Random position
+                const startX = Math.random() * window.innerWidth;
+                const startY = Math.random() * window.innerHeight;
+                el.style.left = `${startX}px`;
+                el.style.top = `${startY}px`;
+                
+                interactiveGiftsContainer.appendChild(el);
+
+                // Floating animation using GSAP
+                gsap.to(el, {
+                    x: `+=${(Math.random() - 0.5) * 100}`,
+                    y: `+=${(Math.random() - 0.5) * 100}`,
+                    rotation: (Math.random() - 0.5) * 360,
+                    duration: 2 + Math.random() * 3,
+                    repeat: -1,
+                    yoyo: true,
+                    ease: "sine.inOut"
+                });
+
+                // Interaction: click to pop
+                el.addEventListener('click', function() {
+                    // Pop animation
+                    gsap.to(this, {
+                        scale: 3,
+                        opacity: 0,
+                        duration: 0.3,
+                        onComplete: () => {
+                            this.remove(); // Remove element
+                            createMiniConfetti(startX, startY); // visual feedback
+                        }
+                    });
+                });
+            }
+        }
+
+
+        // --- STREAMING_CHUNK:Custom Confetti System ---
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const ctx = confettiCanvas.getContext('2d');
+        let confettiParticles = [];
+        let animationFrameId;
+
+        function resizeConfettiCanvas() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeConfettiCanvas);
+        resizeConfettiCanvas();
+
+        class ConfettiParticle {
+            constructor(x, y, isMini = false) {
+                this.x = x || Math.random() * confettiCanvas.width;
+                this.y = y || (Math.random() * confettiCanvas.height - confettiCanvas.height);
+                this.size = (Math.random() * 10 + 5) * (isMini ? 0.5 : 1);
+                this.speedX = Math.random() * 6 - 3;
+                this.speedY = Math.random() * 4 + 2;
+                this.color = Math.random() > 0.5 ? '#ff2a6d' : '#05d9e8'; // Match theme
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = Math.random() * 10 - 5;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.rotation += this.rotationSpeed;
+                // Add gravity
+                this.speedY += 0.1;
+            }
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation * Math.PI / 180);
+                ctx.fillStyle = this.color;
+                ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+                ctx.restore();
+            }
+        }
+
+        function startConfetti() {
+            for(let i=0; i<150; i++) {
+                confettiParticles.push(new ConfettiParticle());
+            }
+            renderConfetti();
+        }
+
+        function createMiniConfetti(x, y) {
+             for(let i=0; i<20; i++) {
+                 // Explode outwards from x,y
+                 let p = new ConfettiParticle(x, y, true);
+                 p.speedY = (Math.random() - 0.5) * 10;
+                 p.speedX = (Math.random() - 0.5) * 10;
+                 confettiParticles.push(p);
+             }
+        }
+
+        function renderConfetti() {
+            ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            
+            for(let i = confettiParticles.length - 1; i >= 0; i--) {
+                const p = confettiParticles[i];
+                p.update();
+                p.draw();
+                
+                // Remove if off screen
+                if(p.y > confettiCanvas.height + 100) {
+                    confettiParticles.splice(i, 1);
+                    // Add new one at top if in continuous mode, but let's let them fall out eventually
+                }
+            }
+
+            if(confettiParticles.length > 0 || currentLayer === 4) {
+                 // Keep loop running if in final layer to allow for mini confetti pops
+                animationFrameId = requestAnimationFrame(renderConfetti);
+            }
+        }
+    </script>
+</body>
+</html>
